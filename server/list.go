@@ -115,14 +115,25 @@ func (p *Plugin) UpdateListReminders(userId string, postId string, offset int) {
 		endOffset,
 		attachments)
 
-	if post, pErr := p.API.GetPost(postId); pErr != nil {
-		p.API.LogError(pErr.Error())
-	} else {
-		post.Props = model.StringInterface{
+	post := &model.Post{
+		Id: postId,
+		UserId: p.remindUserId,
+		Props: model.StringInterface{
 			"attachments": attachments,
-		}
-		defer p.API.UpdatePost(post)
+		},
 	}
+	p.API.UpdateEphemeralPost(userId, post)
+
+	/*
+		if post, pErr := p.API.GetPost(postId); pErr != nil {
+			p.API.LogError(pErr.Error())
+		} else {
+			post.Props = model.StringInterface{
+				"attachments": attachments,
+			}
+			defer p.API.UpdatePost(post)
+		}
+	*/
 }
 
 func (p *Plugin) categorizeOccurrences(reminders []Reminder) (
